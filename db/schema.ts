@@ -54,3 +54,43 @@ export const productMedia = sqliteTable('product_media', {
   isCompliant: integer('is_compliant', { mode: 'boolean' }),
   complianceNotes: text('compliance_notes'),
 });
+
+// 4. accessories_data — extended fields for ~80% of catalog
+export const accessoriesData = sqliteTable('accessories_data', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  universalFit: integer('universal_fit', { mode: 'boolean' }),
+  useCaseRu: text('use_case_ru'),
+  useCaseUz: text('use_case_uz'),
+  materialRu: text('material_ru'),
+  materialUz: text('material_uz'),
+  // JSON: string[]
+  colorOptions: text('color_options'),
+  volumeMl: real('volume_ml'),
+  applicationMethodRu: text('application_method_ru'),
+  applicationMethodUz: text('application_method_uz'),
+  kitContentsRu: text('kit_contents_ru'),
+  kitContentsUz: text('kit_contents_uz'),
+  // JSON: {description_ru, description_uz, items: string[]}
+  bundleInfo: text('bundle_info'),
+});
+
+// 5. parts_data — extended fields for ~20% of catalog
+// compatible_models: JSON [{make, model, year_from, year_to, engine}]
+export const partsData = sqliteTable('parts_data', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  oemNumber: text('oem_number'),
+  // JSON: string[]
+  crossReferences: text('cross_references'),
+  // JSON: {make, model, year_from, year_to, engine}[]
+  compatibleModels: text('compatible_models'),
+  positionRu: text('position_ru'),
+  positionUz: text('position_uz'),
+  partLengthMm: real('part_length_mm'),
+  partWidthMm: real('part_width_mm'),
+  partHeightMm: real('part_height_mm'),
+  partWeightG: real('part_weight_g'),
+  warrantyMonths: integer('warranty_months'),
+  materialSpec: text('material_spec'),
+});
