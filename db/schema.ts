@@ -94,3 +94,85 @@ export const partsData = sqliteTable('parts_data', {
   warrantyMonths: integer('warranty_months'),
   materialSpec: text('material_spec'),
 });
+
+// 6. pricing
+export const pricing = sqliteTable('pricing', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  costPrice: real('cost_price'),
+  sellingPrice: real('selling_price'),
+  discountPrice: real('discount_price'),
+  marginPct: real('margin_pct'),
+  competitorPrice: real('competitor_price'),
+  competitorUrl: text('competitor_url'),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+});
+
+// 7. fulfillment
+// §5.3 Uzum: FBO free window = 60 days, warn at 45, critical at 55
+export const fulfillment = sqliteTable('fulfillment', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  scheme: text('scheme', { enum: ['FBS', 'FBO', 'DBS', 'EDBS'] }).notNull().default('FBS'),
+  stockQuantity: integer('stock_quantity').notNull().default(0),
+  fboTurnoverDays: integer('fbo_turnover_days'),
+  isOversized: integer('is_oversized', { mode: 'boolean' }).notNull().default(false),
+});
+
+// 8. performance — date-stamped snapshots
+export const performance = sqliteTable('performance', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+  impressions: integer('impressions').notNull().default(0),
+  opens: integer('opens').notNull().default(0),
+  cart: integer('cart').notNull().default(0),
+  orders: integer('orders').notNull().default(0),
+  received: integer('received').notNull().default(0),
+  returns: integer('returns').notNull().default(0),
+  conversionPct: real('conversion_pct'),
+  revenue: real('revenue'),
+  rating: real('rating'),
+  reviews: integer('reviews'),
+  roiPct: real('roi_pct'),
+});
+
+// 9. moderation
+export const moderation = sqliteTable('moderation', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  status: text('status', { enum: ['draft', 'ready', 'on_sale', 'blocked', 'archived'] })
+    .notNull()
+    .default('draft'),
+  blockReason: text('block_reason'),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+});
+
+// 10. boost — ad campaign data
+export const boost = sqliteTable('boost', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().unique().references(() => products.id, { onDelete: 'cascade' }),
+  campaignType: text('campaign_type'),
+  bidPer1000: real('bid_per_1000'),
+  dailyBudget: real('daily_budget'),
+  totalBudget: real('total_budget'),
+  // JSON: string[]
+  keywords: text('keywords'),
+  // JSON: string[]
+  negativeKeywords: text('negative_keywords'),
+  drrPct: real('drr_pct'),
+});
+
+// Inferred types for use throughout the app
+export type Product = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;
+export type ProductCard = typeof productCards.$inferSelect;
+export type NewProductCard = typeof productCards.$inferInsert;
+export type ProductMedia = typeof productMedia.$inferSelect;
+export type AccessoriesData = typeof accessoriesData.$inferSelect;
+export type PartsData = typeof partsData.$inferSelect;
+export type Pricing = typeof pricing.$inferSelect;
+export type Fulfillment = typeof fulfillment.$inferSelect;
+export type Performance = typeof performance.$inferSelect;
+export type Moderation = typeof moderation.$inferSelect;
+export type Boost = typeof boost.$inferSelect;
