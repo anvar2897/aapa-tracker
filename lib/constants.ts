@@ -41,7 +41,7 @@ export const SCORE_BLUE_MAX = 89;
 // Uzum stop-word patterns — §8.2 Uzum (no subjective claims, no contact info, no promo)
 export const STOP_WORD_PATTERNS: RegExp[] = [
   // Contact info
-  /\+?[\d\s\-()]{10,}/,
+  /\+998[\s\-]?\d{2}[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}/,
   /\b\d{2}[-\s]\d{3}[-\s]\d{2}[-\s]\d{2}\b/,
   /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i,
   /https?:\/\//i,

@@ -207,7 +207,7 @@ export function computeScore(data: ProductDataForScoring): ScoreBreakdown {
 
   return {
     total,
-    maxPossible: 100,
+    maxPossible: fields.reduce((sum, f) => sum + f.weight, 0),
     color: scoreColor(total),
     fields: breakdown,
   };

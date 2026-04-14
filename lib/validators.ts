@@ -37,7 +37,7 @@ export function checkPhotoCompliance(media: Pick<ProductMedia, 'widthPx' | 'heig
     if (media.heightPx !== null && media.heightPx !== undefined && media.heightPx < PHOTO_MIN_HEIGHT_PX) {
       violations.push(`Height ${media.heightPx}px < required ${PHOTO_MIN_HEIGHT_PX}px`);
     }
-    if (media.widthPx && media.heightPx) {
+    if (media.widthPx != null && media.heightPx != null && media.heightPx !== 0) {
       const ratio = media.widthPx / media.heightPx;
       if (Math.abs(ratio - PHOTO_ASPECT_RATIO) > PHOTO_ASPECT_TOLERANCE) {
         violations.push(`Aspect ratio ${ratio.toFixed(3)} deviates from required 3:4 (0.750)`);
