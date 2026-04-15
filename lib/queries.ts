@@ -296,3 +296,96 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   return { stats: { total, avgScore, lowScoreCount, onSaleCount, catalogRevenue }, distribution, tabCompletion, alerts };
 }
+
+export type AuditIssue = {
+  type: string;
+  productId: number;
+  sku: string;
+  nameRu: string;
+  productProfile: 'accessories' | 'parts';
+  score: number;
+  scheme: 'FBS' | 'FBO' | 'DBS' | 'EDBS';
+  fboTurnoverDays: number | null;
+  status: 'draft' | 'ready' | 'on_sale' | 'blocked' | 'archived';
+};
+
+export type AuditData = {
+  critical: AuditIssue[];
+  high: AuditIssue[];
+  medium: AuditIssue[];
+  low: AuditIssue[];
+};
+
+function fieldMet(row: ProductListRow, label: string): boolean {
+  return row.score.fields.some(f => f.label === label && f.met);
+}
+
+function toIssue(type: string, row: ProductListRow): AuditIssue {
+  return {
+    type,
+    productId: row.id,
+    sku: row.sku,
+    nameRu: row.nameRu,
+    productProfile: row.productProfile,
+    score: row.score.total,
+    scheme: row.scheme,
+    fboTurnoverDays: row.fboTurnoverDays,
+    status: row.status,
+  };
+}
+
+export async function getAuditData(): Promise<AuditData> {
+  const rows = await getProductListRows();
+  const critical: AuditIssue[] = [];
+  const high: AuditIssue[] = [];
+  const medium: AuditIssue[] = [];
+  const low: AuditIssue[] = [];
+
+  for (const row of rows) {
+    // Critical
+    if (row.status === 'blocked') {
+      critical.push(toIssue('blocked', row));
+    }
+    if (!fieldMet(row, 'Title RU') || !fieldMet(row, 'Title UZ')) {
+      critical.push(toIssue('missing_bilingual', row));
+    }
+    if (!fieldMet(row, 'All photos compliant') && row.photoCount > 0) {
+      critical.push(toIssue('photos_non_compliant', row));
+    }
+
+    // High
+    if (row.score.total < 50) {
+      high.push(toIssue('low_score', row));
+    }
+    if (row.productProfile === 'parts' && !fieldMet(row, 'Compatible models')) {
+      high.push(toIssue('parts_no_compatible_models', row));
+    }
+    if (!fieldMet(row, 'Filter properties')) {
+      high.push(toIssue('no_filter_properties', row));
+    }
+    if (!fieldMet(row, 'Price set')) {
+      high.push(toIssue('no_price', row));
+    }
+
+    // Medium
+    if (row.productProfile === 'accessories' && !fieldMet(row, 'Photos ≥3')) {
+      medium.push(toIssue('accessories_few_photos', row));
+    }
+    if (row.productProfile === 'accessories' && !fieldMet(row, 'Use case described')) {
+      medium.push(toIssue('accessories_no_use_case', row));
+    }
+    if (!fieldMet(row, 'Video present')) {
+      medium.push(toIssue('no_video', row));
+    }
+    if (row.productProfile === 'parts' && !fieldMet(row, 'OEM number')) {
+      medium.push(toIssue('parts_no_oem', row));
+    }
+
+    // Low
+    if (row.scheme === 'FBO' && row.fboTurnoverDays !== null && row.fboTurnoverDays >= 45) {
+      low.push(toIssue('fbo_approaching', row));
+    }
+  }
+
+  return { critical, high, medium, low };
+}
