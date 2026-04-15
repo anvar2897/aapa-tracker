@@ -49,7 +49,7 @@ export function ScoreDistributionChart({ distribution }: Props) {
             color: 'hsl(213 31% 91%)',
             fontSize: 12,
           }}
-          formatter={(value: number) => [value, 'Products']}
+          formatter={(value: unknown) => [value as number, 'Products'] as const}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
           {data.map((d) => (

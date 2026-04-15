@@ -51,13 +51,13 @@ export function TabCompletionChart({ tabCompletion }: Props) {
             color: 'hsl(213 31% 91%)',
             fontSize: 12,
           }}
-          formatter={(value: number) => [`${value}%`, 'Completion']}
+          formatter={(value: unknown) => [`${value}%`, 'Completion'] as const}
         />
         <Bar dataKey="metPct" radius={[0, 4, 4, 0]} fill="#f59e0b">
           <LabelList
             dataKey="metPct"
             position="right"
-            formatter={(v: number) => `${v}%`}
+            formatter={(v: unknown) => `${v}%` as unknown as string}
             style={{ fill: 'hsl(215 20% 65%)', fontSize: 11 }}
           />
         </Bar>
