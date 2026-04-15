@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { ScoreBadge } from '@/components/common/ScoreBadge';
 import { ProfileBadge } from '@/components/common/ProfileBadge';
@@ -32,6 +33,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function ProductTable({ rows }: Props) {
+  const router = useRouter();
   const [profileFilter, setProfileFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortKey, setSortKey] = useState<SortKey>('score');
@@ -179,11 +181,12 @@ export function ProductTable({ rows }: Props) {
             {sorted.map((row, idx) => (
               <tr
                 key={row.id}
-                className="transition-colors"
+                className="transition-colors cursor-pointer"
                 style={{
                   backgroundColor: idx % 2 === 0 ? 'hsl(222 47% 12%)' : 'hsl(222 47% 11%)',
                   borderBottom: '1px solid hsl(216 34% 19%)',
                 }}
+                onClick={() => router.push(`/products/${row.id}`)}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'hsl(222 47% 16%)';
                 }}

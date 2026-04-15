@@ -1,4 +1,6 @@
 // app/(app)/products/page.tsx
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { getProductListRows } from '@/lib/queries';
 import { ProductTable } from '@/components/product/ProductTable';
 
@@ -68,6 +70,17 @@ export default async function ProductsPage() {
               <span className="font-mono font-semibold">{fboWarn}</span>
             </div>
           )}
+          <Link
+            href="/products/new"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={{
+              backgroundColor: '#f59e0b',
+              color: 'hsl(222 47% 11%)',
+            }}
+          >
+            <Plus size={14} strokeWidth={2.5} />
+            Добавить товар
+          </Link>
         </div>
       </div>
 
