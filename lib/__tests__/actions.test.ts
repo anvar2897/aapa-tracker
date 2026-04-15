@@ -1,8 +1,13 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, vi } from 'vitest';
 import { createProduct } from '@/app/actions/products';
 import { db } from '@/db';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+
+// Mock revalidatePath for tests
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}));
 
 const createdSkus: string[] = [];
 
