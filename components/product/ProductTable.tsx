@@ -36,6 +36,9 @@ export function ProductTable({ rows }: Props) {
   const router = useRouter();
   const [profileFilter, setProfileFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [search, setSearch] = useState('');
+  const [schemeFilter, setSchemeFilter] = useState<string>('all');
+  const [scoreBand, setScoreBand] = useState<string>('all');
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
@@ -43,9 +46,21 @@ export function ProductTable({ rows }: Props) {
     return rows.filter((r) => {
       if (profileFilter !== 'all' && r.productProfile !== profileFilter) return false;
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (schemeFilter !== 'all' && r.scheme !== schemeFilter) return false;
+      if (scoreBand !== 'all') {
+        const s = r.score.total;
+        if (scoreBand === 'red'    && !(s < 50))            return false;
+        if (scoreBand === 'yellow' && !(s >= 50 && s < 70)) return false;
+        if (scoreBand === 'blue'   && !(s >= 70 && s < 90)) return false;
+        if (scoreBand === 'green'  && !(s >= 90))           return false;
+      }
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        if (!r.sku.toLowerCase().includes(q) && !r.nameRu.toLowerCase().includes(q)) return false;
+      }
       return true;
     });
-  }, [rows, profileFilter, statusFilter]);
+  }, [rows, profileFilter, statusFilter, schemeFilter, scoreBand, search]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -109,6 +124,54 @@ export function ProductTable({ rows }: Props) {
             <option key={v} value={v}>{l}</option>
           ))}
         </select>
+
+        <select
+          value={schemeFilter}
+          onChange={(e) => setSchemeFilter(e.target.value)}
+          className="text-sm rounded-md px-3 py-1.5 font-mono outline-none cursor-pointer"
+          style={{
+            backgroundColor: 'hsl(222 47% 15%)',
+            color: 'hsl(213 31% 91%)',
+            border: '1px solid hsl(216 34% 28%)',
+          }}
+        >
+          <option value="all">Все схемы</option>
+          <option value="FBS">FBS</option>
+          <option value="FBO">FBO</option>
+          <option value="DBS">DBS</option>
+          <option value="EDBS">EDBS</option>
+        </select>
+
+        <select
+          value={scoreBand}
+          onChange={(e) => setScoreBand(e.target.value)}
+          className="text-sm rounded-md px-3 py-1.5 font-mono outline-none cursor-pointer"
+          style={{
+            backgroundColor: 'hsl(222 47% 15%)',
+            color: 'hsl(213 31% 91%)',
+            border: '1px solid hsl(216 34% 28%)',
+          }}
+        >
+          <option value="all">Все score</option>
+          <option value="red">{'<50 (красный)'}</option>
+          <option value="yellow">50–69 (жёлтый)</option>
+          <option value="blue">70–89 (синий)</option>
+          <option value="green">90–100 (зелёный)</option>
+        </select>
+
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Поиск по SKU или названию…"
+          className="text-sm rounded-md px-3 py-1.5 outline-none font-mono"
+          style={{
+            backgroundColor: 'hsl(222 47% 15%)',
+            color: 'hsl(213 31% 91%)',
+            border: '1px solid hsl(216 34% 28%)',
+            minWidth: 220,
+          }}
+        />
 
         <span
           className="text-xs font-mono ml-auto"
