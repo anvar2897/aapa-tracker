@@ -18,14 +18,14 @@ export function Sidebar() {
     <aside
       className="flex flex-col w-56 shrink-0 min-h-screen border-r"
       style={{
-        backgroundColor: 'hsl(222 47% 8%)',
-        borderColor: 'hsl(216 34% 18%)',
+        backgroundColor: 'var(--sidebar)',
+        borderColor: 'var(--sidebar-border)',
       }}
     >
       {/* Logo */}
       <div
         className="px-5 py-5 border-b"
-        style={{ borderColor: 'hsl(216 34% 18%)' }}
+        style={{ borderColor: 'var(--sidebar-border)' }}
       >
         <div className="flex items-baseline gap-2">
           <span className="text-xl font-bold font-mono text-amber-400 tracking-tight">
@@ -73,8 +73,8 @@ export function Sidebar() {
       <div
         className="px-5 py-4 border-t"
         style={{
-          borderColor: 'hsl(216 34% 18%)',
-          color: 'hsl(215 20% 35%)',
+          borderColor: 'var(--sidebar-border)',
+          color: 'var(--sidebar-foreground)',
         }}
       >
         <p className="text-[10px] font-mono">v0.1.0 · SQLite</p>
