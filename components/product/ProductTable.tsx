@@ -1,13 +1,14 @@
 // components/product/ProductTable.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { ScoreBadge } from '@/components/common/ScoreBadge';
 import { ProfileBadge } from '@/components/common/ProfileBadge';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { FboAlert } from '@/components/common/FboAlert';
+import { bulkUpdateStatus } from '@/app/actions/products';
 import type { ProductListRow } from '@/lib/queries';
 
 type SortKey = 'score' | 'sku' | 'status' | 'stock';
@@ -32,8 +33,18 @@ const statusLabels: Record<string, string> = {
   archived: 'Архив',
 };
 
+const bulkStatusOptions: { value: 'draft' | 'ready' | 'on_sale' | 'blocked' | 'archived'; label: string }[] = [
+  { value: 'draft',    label: 'Черновик' },
+  { value: 'ready',   label: 'Готов' },
+  { value: 'on_sale', label: 'Продаётся' },
+  { value: 'blocked', label: 'Заблокирован' },
+  { value: 'archived',label: 'Архив' },
+];
+
 export function ProductTable({ rows }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const [profileFilter, setProfileFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -41,6 +52,8 @@ export function ProductTable({ rows }: Props) {
   const [scoreBand, setScoreBand] = useState<string>('all');
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkError, setBulkError] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -73,6 +86,10 @@ export function ProductTable({ rows }: Props) {
     });
   }, [filtered, sortKey, sortDir]);
 
+  const filteredIds = useMemo(() => new Set(sorted.map((r) => r.id)), [sorted]);
+  const allFilteredSelected = sorted.length > 0 && sorted.every((r) => selected.has(r.id));
+  const someSelected = selected.size > 0;
+
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -80,6 +97,46 @@ export function ProductTable({ rows }: Props) {
       setSortKey(key);
       setSortDir('asc');
     }
+  }
+
+  function toggleRow(id: number, e: React.MouseEvent) {
+    e.stopPropagation();
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.checked) {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        sorted.forEach((r) => next.add(r.id));
+        return next;
+      });
+    } else {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        sorted.forEach((r) => next.delete(r.id));
+        return next;
+      });
+    }
+  }
+
+  function handleBulkStatus(status: 'draft' | 'ready' | 'on_sale' | 'blocked' | 'archived') {
+    setBulkError(null);
+    const ids = Array.from(selected).filter((id) => filteredIds.has(id));
+    startTransition(async () => {
+      const r = await bulkUpdateStatus(ids, status);
+      if ('error' in r) {
+        setBulkError(r.error);
+      } else {
+        setSelected(new Set());
+        router.refresh();
+      }
+    });
   }
 
   function SortIcon({ k }: { k: SortKey }) {
@@ -181,6 +238,49 @@ export function ProductTable({ rows }: Props) {
         </span>
       </div>
 
+      {/* Bulk action bar */}
+      {someSelected && (
+        <div
+          className="flex items-center gap-3 px-4 py-2.5 rounded-md"
+          style={{
+            backgroundColor: 'hsl(222 47% 17%)',
+            border: '1px solid hsl(216 34% 28%)',
+          }}
+        >
+          <span className="text-sm font-mono" style={{ color: 'hsl(213 31% 80%)' }}>
+            Выбрано: {selected.size}
+          </span>
+          <span className="text-xs" style={{ color: 'hsl(215 20% 45%)' }}>
+            Изменить статус:
+          </span>
+          {bulkStatusOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleBulkStatus(opt.value)}
+              disabled={isPending}
+              className="text-xs px-3 py-1 rounded cursor-pointer disabled:opacity-50 transition-colors hover:text-amber-400"
+              style={{
+                backgroundColor: 'hsl(222 47% 12%)',
+                color: 'hsl(213 31% 75%)',
+                border: '1px solid hsl(216 34% 22%)',
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+          <button
+            onClick={() => setSelected(new Set())}
+            className="ml-auto text-xs cursor-pointer hover:text-red-400 transition-colors"
+            style={{ color: 'hsl(215 20% 45%)' }}
+          >
+            Снять выбор
+          </button>
+          {bulkError && (
+            <span className="text-xs text-red-400">{bulkError}</span>
+          )}
+        </div>
+      )}
+
       {/* Table */}
       <div
         className="rounded-lg overflow-hidden"
@@ -189,6 +289,15 @@ export function ProductTable({ rows }: Props) {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr style={{ backgroundColor: 'hsl(222 47% 13%)', borderBottom: '1px solid hsl(216 34% 22%)' }}>
+              <th className="px-4 py-3 text-left" style={{ width: 36 }}>
+                <input
+                  type="checkbox"
+                  checked={allFilteredSelected}
+                  onChange={toggleAll}
+                  className="cursor-pointer"
+                  style={{ accentColor: '#f59e0b' }}
+                />
+              </th>
               <th className="px-4 py-3 text-left font-medium" style={{ color: 'hsl(215 20% 55%)', width: 48 }} />
               <th
                 className="px-4 py-3 text-left font-medium cursor-pointer select-none"
@@ -233,7 +342,7 @@ export function ProductTable({ rows }: Props) {
             {sorted.length === 0 && (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="px-4 py-10 text-center text-sm"
                   style={{ color: 'hsl(215 20% 45%)' }}
                 >
@@ -246,18 +355,32 @@ export function ProductTable({ rows }: Props) {
                 key={row.id}
                 className="transition-colors cursor-pointer"
                 style={{
-                  backgroundColor: idx % 2 === 0 ? 'hsl(222 47% 12%)' : 'hsl(222 47% 11%)',
+                  backgroundColor: selected.has(row.id)
+                    ? 'hsl(222 47% 18%)'
+                    : idx % 2 === 0 ? 'hsl(222 47% 12%)' : 'hsl(222 47% 11%)',
                   borderBottom: '1px solid hsl(216 34% 19%)',
                 }}
                 onClick={() => router.push(`/products/${row.id}`)}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'hsl(222 47% 16%)';
+                  if (!selected.has(row.id)) {
+                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'hsl(222 47% 16%)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                    idx % 2 === 0 ? 'hsl(222 47% 12%)' : 'hsl(222 47% 11%)';
+                  (e.currentTarget as HTMLTableRowElement).style.backgroundColor = selected.has(row.id)
+                    ? 'hsl(222 47% 18%)'
+                    : idx % 2 === 0 ? 'hsl(222 47% 12%)' : 'hsl(222 47% 11%)';
                 }}
               >
+                <td className="px-4 py-3" onClick={(e) => toggleRow(row.id, e)}>
+                  <input
+                    type="checkbox"
+                    checked={selected.has(row.id)}
+                    onChange={() => {}}
+                    className="cursor-pointer"
+                    style={{ accentColor: '#f59e0b' }}
+                  />
+                </td>
                 <td className="px-4 py-3">
                   <ProfileBadge profile={row.productProfile} />
                 </td>

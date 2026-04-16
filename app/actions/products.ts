@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/db';
 import {
@@ -335,6 +335,22 @@ export async function deleteMedia(mediaId: number, productId: number): Promise<A
     revalidatePath(`/products/${productId}`);
     revalidatePath('/products');
     return { ok: true };
+  } catch (e) {
+    return toError(e);
+  }
+}
+
+export async function bulkUpdateStatus(
+  ids: number[],
+  status: 'draft' | 'ready' | 'on_sale' | 'blocked' | 'archived',
+): Promise<ActionResult<{ updatedCount: number }>> {
+  if (ids.length === 0) return { updatedCount: 0 };
+  try {
+    await db.update(moderation)
+      .set({ status })
+      .where(inArray(moderation.productId, ids));
+    revalidatePath('/products');
+    return { updatedCount: ids.length };
   } catch (e) {
     return toError(e);
   }
