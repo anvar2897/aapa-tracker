@@ -20,7 +20,10 @@ export function TopBar() {
         borderColor: 'var(--border)',
       }}
     >
-      <div className="flex items-center rounded-full border p-0.5 gap-0.5"
+      <div
+        role="group"
+        aria-label="Theme"
+        className="flex items-center rounded-full border p-0.5 gap-0.5"
         style={{ borderColor: 'var(--border)' }}
       >
         {THEMES.map(({ value, label, icon: Icon }) => {
@@ -31,10 +34,11 @@ export function TopBar() {
               onClick={() => setTheme(value)}
               data-active={active}
               aria-label={label}
+              aria-pressed={active}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors duration-150"
               style={
                 active
-                  ? { backgroundColor: 'hsl(38 92% 50%)', color: 'hsl(222 47% 11%)' }
+                  ? { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }
                   : { color: 'var(--muted-foreground)' }
               }
             >
