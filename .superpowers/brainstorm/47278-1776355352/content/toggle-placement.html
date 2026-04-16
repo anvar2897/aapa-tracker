@@ -1,0 +1,78 @@
+<h2>Where should the theme toggle live?</h2>
+<p class="subtitle">App has a left sidebar (w-56) with logo, nav links, and footer. Pick the placement that fits best.</p>
+
+<div class="cards" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0f1623; border-radius: 6px; min-height: 200px; display: flex; flex-direction: row; gap: 8px;">
+      <!-- Sidebar -->
+      <div style="width: 56px; background: #0a0f1a; border-radius: 4px; display: flex; flex-direction: column; padding: 8px 4px; gap: 6px;">
+        <div style="height: 12px; background: #f59e0b; border-radius: 2px; width: 80%;"></div>
+        <div style="flex:1;"></div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="flex:1;"></div>
+        <!-- Toggle at bottom -->
+        <div style="height: 20px; background: #1e293b; border: 1px solid #f59e0b33; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+          <div style="font-size: 9px; color: #f59e0b;">☀ ◐ ☾</div>
+        </div>
+        <div style="height: 6px; background: #1e293b; border-radius: 2px; width: 60%;"></div>
+      </div>
+      <!-- Content -->
+      <div style="flex:1; background: #111827; border-radius: 4px;"></div>
+    </div>
+    <div class="card-body">
+      <h3>A — Sidebar footer</h3>
+      <p>Toggle sits above the version string in sidebar footer. Always visible, minimal footprint. Fits the existing sidebar footer area naturally.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0f1623; border-radius: 6px; min-height: 200px; display: flex; flex-direction: row; gap: 8px;">
+      <!-- Sidebar -->
+      <div style="width: 56px; background: #0a0f1a; border-radius: 4px; display: flex; flex-direction: column; padding: 8px 4px; gap: 6px;">
+        <!-- Logo + toggle inline -->
+        <div style="display: flex; align-items: center; justify-content: space-between; height: 12px;">
+          <div style="height: 10px; background: #f59e0b; border-radius: 2px; width: 55%;"></div>
+          <div style="width: 14px; height: 14px; background: #1e293b; border: 1px solid #374151; border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size: 7px; color: #94a3b8;">◐</div>
+          </div>
+        </div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="height: 8px; background: #374151; border-radius: 2px;"></div>
+        <div style="flex:1;"></div>
+        <div style="height: 6px; background: #1e293b; border-radius: 2px; width: 60%;"></div>
+      </div>
+      <!-- Content -->
+      <div style="flex:1; background: #111827; border-radius: 4px;"></div>
+    </div>
+    <div class="card-body">
+      <h3>B — Sidebar header</h3>
+      <p>Small icon button next to "AAPA" logo in sidebar header. Compact, always accessible, pairs with branding area.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0f1623; border-radius: 6px; min-height: 200px; display: flex; flex-direction: column; gap: 8px;">
+      <!-- Top bar -->
+      <div style="height: 24px; background: #0a0f1a; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding: 0 8px;">
+        <div style="width: 40px; height: 14px; background: #1e293b; border: 1px solid #374151; border-radius: 10px; display: flex; align-items: center; justify-content: space-around; padding: 0 2px;">
+          <div style="font-size: 7px; color: #f59e0b;">☀</div>
+          <div style="font-size: 7px; color: #94a3b8;">☾</div>
+        </div>
+      </div>
+      <!-- Main area -->
+      <div style="flex:1; display: flex; gap: 8px;">
+        <div style="width: 56px; background: #0a0f1a; border-radius: 4px;"></div>
+        <div style="flex:1; background: #111827; border-radius: 4px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Top bar</h3>
+      <p>Pill toggle in a top header bar spanning full width. More prominent, adds a top bar that doesn't currently exist. Extra layout complexity.</p>
+    </div>
+  </div>
+
+</div>

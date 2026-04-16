@@ -1,0 +1,78 @@
+<h2>Theme system — built and working</h2>
+<p class="subtitle">Build passes. Here's what was implemented.</p>
+
+<div class="section">
+  <h3>What's in place</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;width:200px;">Library</td>
+      <td style="padding:8px 12px;">next-themes 0.4.6 — handles SSR, localStorage, OS detection</td>
+    </tr>
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;">ThemeProvider</td>
+      <td style="padding:8px 12px;"><code>components/common/ThemeProvider.tsx</code> — wraps app with <code>attribute="class" defaultTheme="system" enableSystem</code></td>
+    </tr>
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;">Toggle UI</td>
+      <td style="padding:8px 12px;"><code>components/common/TopBar.tsx</code> — top bar with Light / System / Dark pill</td>
+    </tr>
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;">CSS tokens</td>
+      <td style="padding:8px 12px;"><code>app/globals.css</code> — light theme in <code>:root</code>, dark theme in <code>.dark</code>. Sidebar stays dark in both modes.</td>
+    </tr>
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;">Transitions</td>
+      <td style="padding:8px 12px;"><code>background-color</code>, <code>color</code>, <code>border-color</code>, <code>fill</code> — all 200ms ease</td>
+    </tr>
+    <tr style="border-bottom:1px solid #374151">
+      <td style="padding:8px 12px;color:#94a3b8;">Storage</td>
+      <td style="padding:8px 12px;">next-themes auto-persists to <code>localStorage</code> key <code>theme</code></td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;color:#94a3b8;">Tests</td>
+      <td style="padding:8px 12px;"><code>TopBar.test.tsx</code> — 5/5 passing (renders, clicks, active state)</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <h3>Toggle preview (top bar, option C)</h3>
+  <div class="mockup">
+    <div class="mockup-header">TopBar — top of every page</div>
+    <div class="mockup-body" style="padding:0;background:#1e293b;">
+      <!-- Simulated top bar -->
+      <div style="height:40px;background:#1e2d40;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;">
+        <div style="display:flex;align-items:center;gap:2px;background:#0f172a;border:1px solid #334155;border-radius:20px;padding:2px;">
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:transparent;color:#94a3b8;font-size:11px;">
+            ☀ Light
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:#f59e0b;color:#1a1a2e;font-size:11px;font-weight:600;">
+            ◐ System
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:transparent;color:#94a3b8;font-size:11px;">
+            ☾ Dark
+          </div>
+        </div>
+      </div>
+      <!-- Below top bar -->
+      <div style="display:flex;height:120px;">
+        <div style="width:80px;background:#0a0f1a;border-right:1px solid #1e293b;padding:8px;">
+          <div style="height:8px;width:70%;background:#f59e0b;border-radius:2px;margin-bottom:12px;"></div>
+          <div style="height:6px;background:#1e293b;border-radius:2px;margin-bottom:6px;"></div>
+          <div style="height:6px;background:#1e293b;border-radius:2px;margin-bottom:6px;"></div>
+          <div style="height:6px;background:#1e293b;border-radius:2px;"></div>
+        </div>
+        <div style="flex:1;background:#0f172a;padding:12px;">
+          <div style="height:8px;width:40%;background:#1e293b;border-radius:2px;margin-bottom:8px;"></div>
+          <div style="height:6px;width:70%;background:#1e293b;border-radius:2px;margin-bottom:6px;"></div>
+          <div style="height:6px;width:55%;background:#1e293b;border-radius:2px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:16px;background:#0d2818;border:1px solid #166534;border-radius:6px;padding:16px;">
+  <p style="color:#4ade80;font-weight:600;margin:0 0 4px;">Build: ✓ passing</p>
+  <p style="color:#86efac;font-size:13px;margin:0;">Tests: 5/5 passing · No TypeScript errors</p>
+</div>
