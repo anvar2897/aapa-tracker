@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { FormField, inputStyle } from '@/components/product/FormField';
+import { checkStopWords } from '@/lib/validators';
 import { updateCardInfo, updateProduct } from '@/app/actions/products';
 import { VAT_OPTIONS } from '@/lib/constants';
 import type { Product, ProductCard } from '@/db/schema';
@@ -89,6 +90,11 @@ export function CardInfoTab({ productId, product, card }: Props) {
     });
   }
 
+  const swTitleRu = checkStopWords(titleRu);
+  const swTitleUz = checkStopWords(titleUz);
+  const swDescRu  = checkStopWords(descriptionRu);
+  const swDescUz  = checkStopWords(descriptionUz);
+
   return (
     <form onSubmit={handleSave} className="space-y-6">
       <Section title="Основное">
@@ -122,6 +128,16 @@ export function CardInfoTab({ productId, product, card }: Props) {
             <input type="text" value={titleUz} onChange={(e) => setTitleUz(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-md outline-none" style={inputStyle} />
           </FormField>
+          {!swTitleRu.valid && (
+            <p className="col-span-1 text-[11px] mt-[-12px]" style={{ color: '#f59e0b' }}>
+              ⚠ Стоп-слова: {swTitleRu.violations.slice(0, 2).join(' · ')}
+            </p>
+          )}
+          {!swTitleUz.valid && (
+            <p className="col-span-1 text-[11px] mt-[-12px]" style={{ color: '#f59e0b' }}>
+              ⚠ Стоп-слова: {swTitleUz.violations.slice(0, 2).join(' · ')}
+            </p>
+          )}
           <FormField label="Короткое описание (RU)">
             <input type="text" value={shortDescRu} onChange={(e) => setShortDescRu(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-md outline-none" style={inputStyle} />
@@ -134,10 +150,20 @@ export function CardInfoTab({ productId, product, card }: Props) {
             <textarea rows={4} value={descriptionRu} onChange={(e) => setDescriptionRu(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-md outline-none resize-y" style={inputStyle} />
           </FormField>
+          {!swDescRu.valid && (
+            <p className="col-span-2 text-[11px] mt-[-12px]" style={{ color: '#f59e0b' }}>
+              ⚠ Стоп-слова: {swDescRu.violations.slice(0, 2).join(' · ')}
+            </p>
+          )}
           <FormField label="Полное описание (UZ)" span={2}>
             <textarea rows={4} value={descriptionUz} onChange={(e) => setDescriptionUz(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-md outline-none resize-y" style={inputStyle} />
           </FormField>
+          {!swDescUz.valid && (
+            <p className="col-span-2 text-[11px] mt-[-12px]" style={{ color: '#f59e0b' }}>
+              ⚠ Стоп-слова: {swDescUz.violations.slice(0, 2).join(' · ')}
+            </p>
+          )}
         </div>
       </Section>
 
