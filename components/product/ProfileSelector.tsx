@@ -182,7 +182,7 @@ const inputStyle: React.CSSProperties = {
   border: '1px solid hsl(216 34% 28%)',
 };
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <label className="block">
       <span className="block text-xs mb-1.5" style={{ color: 'hsl(215 20% 55%)' }}>
