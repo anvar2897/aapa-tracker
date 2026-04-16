@@ -1,3 +1,5 @@
+import { ImportForm } from '@/components/import/ImportForm';
+
 export default function ImportPage() {
   return (
     <div className="px-8 py-8">
@@ -9,10 +11,11 @@ export default function ImportPage() {
           Импорт / Экспорт
         </h1>
         <p className="text-sm mt-1" style={{ color: 'hsl(215 20% 55%)' }}>
-          Экспорт каталога · CSV импорт (Phase 4B)
+          CSV импорт и экспорт каталога
         </p>
       </div>
 
+      {/* Export section */}
       <div
         className="rounded-lg p-6 mb-6"
         style={{ backgroundColor: 'hsl(222 47% 15%)', border: '1px solid hsl(216 34% 22%)' }}
@@ -33,19 +36,36 @@ export default function ImportPage() {
         </a>
       </div>
 
+      {/* Import section */}
       <div
-        className="rounded-lg p-6"
-        style={{
-          backgroundColor: 'hsl(222 47% 13%)',
-          border: '1px dashed hsl(216 34% 28%)',
-        }}
+        className="rounded-lg p-6 mb-6"
+        style={{ backgroundColor: 'hsl(222 47% 15%)', border: '1px solid hsl(216 34% 22%)' }}
       >
-        <h2 className="text-sm font-medium mb-1" style={{ color: 'hsl(215 20% 55%)' }}>
-          CSV Импорт
+        <h2 className="text-sm font-medium mb-1" style={{ color: 'hsl(213 31% 91%)' }}>
+          Импорт из CSV
         </h2>
-        <p className="text-xs" style={{ color: 'hsl(215 20% 40%)' }}>
-          Будет доступно в Phase 4B
+        <p className="text-xs mb-1" style={{ color: 'hsl(215 20% 55%)' }}>
+          Загрузите CSV-файл для массового создания товаров. Колонки: sku, barcode, productProfile, nameRu, nameUz
         </p>
+        <div className="flex gap-4 mb-4">
+          <a
+            href="/templates/aapa-accessories-template.csv"
+            className="text-xs underline"
+            style={{ color: 'hsl(215 20% 55%)' }}
+            download
+          >
+            Шаблон: Аксессуары
+          </a>
+          <a
+            href="/templates/aapa-parts-template.csv"
+            className="text-xs underline"
+            style={{ color: 'hsl(215 20% 55%)' }}
+            download
+          >
+            Шаблон: Запчасти
+          </a>
+        </div>
+        <ImportForm />
       </div>
     </div>
   );
