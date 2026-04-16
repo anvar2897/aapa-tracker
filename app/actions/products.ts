@@ -340,6 +340,16 @@ export async function deleteMedia(mediaId: number, productId: number): Promise<A
   }
 }
 
+export async function deleteProduct(productId: number): Promise<ActionResult> {
+  try {
+    await db.delete(products).where(eq(products.id, productId));
+    revalidatePath('/products');
+    return { ok: true };
+  } catch (e) {
+    return toError(e);
+  }
+}
+
 export async function bulkUpdateStatus(
   ids: number[],
   status: 'draft' | 'ready' | 'on_sale' | 'blocked' | 'archived',

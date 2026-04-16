@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { ScoreBadge } from '@/components/common/ScoreBadge';
 import { ProfileBadge } from '@/components/common/ProfileBadge';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { ScoreBreakdownPanel } from './ScoreBreakdownPanel';
+import { deleteProduct } from '@/app/actions/products';
 import { CardInfoTab } from './tabs/CardInfoTab';
 import { PropertiesTab } from './tabs/PropertiesTab';
 import { MediaTab } from './tabs/MediaTab';
@@ -35,7 +37,24 @@ const tabs: { key: TabKey; label: string }[] = [
 
 export function ProductEditor({ detail }: { detail: ProductDetail }) {
   const [tab, setTab] = useState<TabKey>('info');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const productId = detail.product.id;
+
+  function handleDelete() {
+    setDeleteError(null);
+    startTransition(async () => {
+      const r = await deleteProduct(productId);
+      if ('error' in r) {
+        setDeleteError(r.error);
+        setConfirmDelete(false);
+      } else {
+        router.push('/products');
+      }
+    });
+  }
 
   return (
     <div className="px-8 py-8">
@@ -68,7 +87,47 @@ export function ProductEditor({ detail }: { detail: ProductDetail }) {
             </div>
           </div>
         </div>
-        <ScoreBadge score={detail.score.total} size={64} />
+
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Delete control */}
+          {!confirmDelete ? (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors hover:text-red-400 hover:border-red-700"
+              style={{
+                color: 'hsl(215 20% 45%)',
+                border: '1px solid hsl(216 34% 22%)',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Trash2 size={13} />
+              Удалить
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs" style={{ color: '#ef4444' }}>Удалить товар?</span>
+              <button
+                onClick={handleDelete}
+                disabled={isPending}
+                className="text-xs px-3 py-1.5 rounded-md disabled:opacity-50 cursor-pointer"
+                style={{ backgroundColor: '#ef4444', color: '#fff' }}
+              >
+                {isPending ? 'Удаляем…' : 'Да, удалить'}
+              </button>
+              <button
+                onClick={() => { setConfirmDelete(false); setDeleteError(null); }}
+                className="text-xs px-3 py-1.5 rounded-md cursor-pointer"
+                style={{ color: 'hsl(213 31% 75%)', border: '1px solid hsl(216 34% 22%)' }}
+              >
+                Отмена
+              </button>
+            </div>
+          )}
+          {deleteError && (
+            <span className="text-xs text-red-400">{deleteError}</span>
+          )}
+          <ScoreBadge score={detail.score.total} size={64} />
+        </div>
       </div>
 
       {/* Two-column layout: tabs + breakdown */}
